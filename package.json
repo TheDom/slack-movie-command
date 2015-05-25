@@ -1,0 +1,31 @@
+{
+  "name": "slack-movie-command",
+  "version": "0.1.0",
+  "description": "/movie <name> command for Slack",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.12.4",
+    "express": "^4.12.4",
+    "slack-notify": "^0.1.4"
+  },
+  "engines": {
+    "node": "0.12.x"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TheDom/slack-movie-command"
+  },
+  "keywords": [
+    "slack",
+    "command",
+    "movie",
+    "imdb",
+    "rotten tomatoes",
+    "rottentomatoes"
+  ],
+  "author": "Dominik Gruber",
+  "license": "MIT"
+}
