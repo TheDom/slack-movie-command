@@ -18,6 +18,28 @@ app.post('/', function (req, res) {
       return;
     }
 
+    // Build Slack response
+    var fields = [{
+      title: 'Rotten Tomatoes Rating',
+      value: (rtMovie.ratings.critics_score ? rtMovie.ratings.critics_score + '%' : '_No rating_'),
+      short: true
+    }];
+    if (rtMovie.year) {
+      fields.push({
+        title: 'Year',
+        value: rtMovie.year,
+        short: true
+      });
+    }
+    if (rtMovie.runtime) {
+      fields.push({
+        title: 'Runtime',
+        value: rtMovie.runtime + ' min',
+        short: true
+      });
+    }
+
+    // Send to Slack
     slack.send({
       username: 'moviebot',
       icon_emoji: ':movie_camera:',
@@ -27,20 +49,8 @@ app.post('/', function (req, res) {
         title: rtMovie.title,
         title_link: rtMovie.links.alternate,
         color: '#FDEE00',
-        image_url: rtMovie.posters.original,
-        fields: [{
-          title: 'Rotten Tomatoes Rating',
-          value: rtMovie.ratings.critics_score + '%',
-          short: true
-        }, {
-          title: 'Year',
-          value: rtMovie.year,
-          short: true
-        }, {
-          title: 'Runtime',
-          value: rtMovie.runtime + ' min',
-          short: true
-        }]
+        image_url: (rtMovie.posters ? rtMovie.posters.original : null),
+        fields: fields
       }]
     });
 
