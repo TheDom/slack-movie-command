@@ -1,0 +1,21 @@
+{
+  "name": "slack-movie-command",
+  "description": "/movie <name> command for Slack",
+  "repository": "https://github.com/TheDom/slack-movie-command",
+  "website": "https://github.com/TheDom/slack-movie-command",
+  "keywords": ["slack", "command", "movie", "imdb", "rotten tomatoes", "rottentomatoes"],
+  "env": {
+    "PORT": {
+      "description": "Port the application should listen at. Default: 3000.",
+      "required": false
+    },
+    "SLACK_HOOK_URL": {
+      "description": "Slack incoming Webhook URL",
+      "required": true
+    },
+    "RT_API_KEY": {
+      "description": "Rotten Tomatoes API Key",
+      "required": true
+    }
+  }
+}
