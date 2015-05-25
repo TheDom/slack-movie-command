@@ -2,8 +2,10 @@
 
 var express = require('express');
 var bodyParser = require('body-parser');
+var numeral = require('numeral');
 var slack = require('slack-notify')(process.env.SLACK_HOOK_URL);
 
+var imdb = require('node-movie');
 var RottenTomatoes = require('./rottentomatoes.js');
 var rt = new RottenTomatoes(process.env.RT_API_KEY);
 
@@ -12,49 +14,70 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post('/', function (req, res) {
-  rt.search(req.body.text, function(rtMovie) {
-    if (rtMovie === null) {
+  var q = req.body.text;
+  // Search RottenTomatoes
+  rt.search(q, function(rtData) {
+    if (!rtData) {
       res.status(404).send('Movie not found');
       return;
     }
 
-    // Build Slack response
-    var fields = [{
-      title: 'Rotten Tomatoes Rating',
-      value: (rtMovie.ratings.critics_score ? rtMovie.ratings.critics_score + '%' : '_No rating_'),
-      short: true
-    }];
-    if (rtMovie.year) {
-      fields.push({
-        title: 'Year',
-        value: rtMovie.year,
-        short: true
-      });
-    }
-    if (rtMovie.runtime) {
-      fields.push({
-        title: 'Runtime',
-        value: rtMovie.runtime + ' min',
-        short: true
-      });
-    }
+    // Search IMDb
+    var imdbCallback = function(err, imdbData) {
+      if (err || !imdbData) {
+        res.status(404).send('Movie not found');
+        return;
+      }
 
-    // Send to Slack
-    slack.send({
-      username: 'moviebot',
-      icon_emoji: ':movie_camera:',
-      channel: req.body.channel_id,
-      text: '_' + req.body.command + ' ' + req.body.text + '_',
-      attachments: [{
-        title: rtMovie.title,
-        title_link: rtMovie.links.alternate,
-        color: '#FDEE00',
-        image_url: (rtMovie.posters ? rtMovie.posters.original : null),
-        fields: fields
-      }]
-    });
+      // Build Slack response
+      var fields = [{
+        title: 'Rotten Tomatoes Rating',
+        value: (rtData.ratings.critics_score ? rtData.ratings.critics_score + '%' : '_No rating_'),
+        short: true
+      }, {
+        title: 'IMDb Rating',
+        value: (imdbData.imdbRating ? imdbData.imdbRating + ' (' + numeral(imdbData.imdbVotes).format('0,0') + ' votes)' : '_No rating_'),
+        short: true
+      }];
+      if (imdbData.Year || rtData.year) {
+        fields.push({
+          title: 'Year',
+          value: (imdbData.Year ? imdbData.Year : rtData.year),
+          short: true
+        });
+      }
+      if (imdbData.Runtime || rtData.runtime) {
+        fields.push({
+          title: 'Runtime',
+          value: (imdbData.Runtime ? imdbData.Runtime : rtData.runtime + ' min'),
+          short: true
+        });
+      }
 
-    res.send();
+      // Send to Slack
+      slack.send({
+        username: 'moviebot',
+        icon_emoji: ':movie_camera:',
+        channel: req.body.channel_id,
+        text: '_' + req.body.command + ' ' + req.body.text + '_',
+        attachments: [{
+          title: rtData.title,
+          title_link: rtData.links.alternate,
+          color: '#FDEE00',
+          image_url: (rtData.posters ? rtData.posters.original : null),
+          fields: fields
+        }]
+      });
+
+      res.send();
+    };
+
+    var imdbId = (rtData.alternate_ids ? rtData.alternate_ids.imdb : null);
+    if (imdbId) {
+      imdb.getByID('tt' + imdbId, imdbCallback);
+    } else {
+      imdb(q, imdbCallback);
+    }
   });
 });
 
