@@ -32,11 +32,11 @@ app.post('/', function (req, res) {
       // Build Slack response
       var fields = [{
         title: 'Rotten Tomatoes Rating',
-        value: (rtData.ratings.critics_score ? rtData.ratings.critics_score + '%' : '_No rating_'),
+        value: '<' + rtData.links.alternate + '|' + (rtData.ratings.critics_score ? rtData.ratings.critics_score + '%' : '_No rating_') + '>',
         short: true
       }, {
         title: 'IMDb Rating',
-        value: (imdbData.imdbRating ? imdbData.imdbRating + ' (' + numeral(imdbData.imdbVotes).format('0,0') + ' votes)' : '_No rating_'),
+        value: '<http://www.imdb.com/title/' + imdbData.imdbID + '|' + (imdbData.imdbRating !== 'N/A' ? imdbData.imdbRating + ' (' + numeral(imdbData.imdbVotes).format('0,0') + ' votes)' : '_No rating_') + '>',
         short: true
       }];
       if (imdbData.Year || rtData.year) {
@@ -46,10 +46,10 @@ app.post('/', function (req, res) {
           short: true
         });
       }
-      if (imdbData.Runtime || rtData.runtime) {
+      if (imdbData.Runtime !== 'N/A' || rtData.runtime) {
         fields.push({
           title: 'Runtime',
-          value: (imdbData.Runtime ? imdbData.Runtime : rtData.runtime + ' min'),
+          value: (imdbData.Runtime !== 'N/A' ? imdbData.Runtime : rtData.runtime + ' min'),
           short: true
         });
       }
