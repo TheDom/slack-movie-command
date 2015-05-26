@@ -15,14 +15,13 @@ IMDb.search = function(imdbId, callback) {
     response.on('error', function(e) { callback(null); });
     response.on('end', function() {
       var $ = cheerio.load(str);
-
       callback({
         imdbId: imdbId,
         title: $('h1.header span.itemprop').text(),
         year: $('h1.header span.nobr a').text(),
-        rating: $('span[itemprop=ratingValue]').text(),
-        votes: $('span[itemprop=ratingCount]').text(),
-        runtime: $('div.txt-block time[itemprop=duration]').text()
+        rating: $('span[itemprop=ratingValue]').first().text(),
+        votes: $('span[itemprop=ratingCount]').first().text(),
+        runtime: $('div.txt-block time[itemprop=duration]').first().text()
       });
     });
   };

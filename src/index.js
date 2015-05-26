@@ -16,7 +16,7 @@ app.post('/', function (req, res) {
   var q = req.body.text;
   // Search RottenTomatoes
   rt.search(q, function(rtData) {
-    if (!rtData) {
+    if (!rtData || rtData.id === '770948116') {   // The movie with the ID 770948116 gets usually returned for wrong input
       res.status(404).send('Movie not found');
       return;
     }
