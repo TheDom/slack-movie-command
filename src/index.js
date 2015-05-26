@@ -27,7 +27,7 @@ app.post('/', function (req, res) {
       // Build Slack response
       var fields = [{
         title: 'Rotten Tomatoes Rating',
-        value: '<' + rtData.links.alternate + '|' + (rtData.ratings.critics_score ? rtData.ratings.critics_score + '%' : '_No rating_') + '>',
+        value: '<' + rtData.links.alternate + '|' + (rtData.ratings.critics_score >= 0 ? rtData.ratings.critics_score + '%' : '_No rating_') + '>',
         short: true
       }, {
         title: 'IMDb Rating',
@@ -59,7 +59,7 @@ app.post('/', function (req, res) {
           title: rtData.title,
           // title_link: rtData.links.alternate,
           color: '#FDEE00',
-          image_url: (rtData.posters ? rtData.posters.original : null),
+          image_url: (rtData.posters && rtData.posters.original !== 'http://d3biamo577v4eu.cloudfront.net/static/images/redesign/poster_default_thumb.gif' ? rtData.posters.original : null),
           fields: fields
         }]
       });
