@@ -50,7 +50,7 @@ function findShowtimes(skipId, date) {
     var url = 'http://www.skip.at/kinoprogramm/wien/filme/?filter=OF&film=' + skipId + '&datum=' + date.toISOString().substr(0, 10);
     request(url, function(error, response, body) {
       var data = {
-        date: weekdays[data.getDay()] + ', ' + date.toISOString().substr(5, 5),
+        date: weekdays[date.getDay()] + ', ' + date.toISOString().substr(5, 5),
         cinemas: []
       };
 
