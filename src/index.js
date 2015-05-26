@@ -27,11 +27,11 @@ app.post('/', function (req, res) {
       // Build Slack response
       var fields = [{
         title: 'Rotten Tomatoes Rating',
-        value: '<' + rtData.links.alternate + '|' + (rtData.ratings.critics_score >= 0 ? rtData.ratings.critics_score + '%' : '_No rating_') + '>',
+        value: '<' + rtData.links.alternate + '|' + (rtData.ratings.critics_score >= 0 ? rtData.ratings.critics_score + '%' : 'No rating') + '>',
         short: true
       }, {
         title: 'IMDb Rating',
-        value: (imdbData ? '<http://www.imdb.com/title/tt' + imdbData.imdbId + '|' + (imdbData.rating ? imdbData.rating + ' (' + imdbData.votes + ' votes)' : '_No rating_') + '>' : '_Not found_'),
+        value: (imdbData ? '<http://www.imdb.com/title/tt' + imdbData.imdbId + '|' + (imdbData.rating ? imdbData.rating + ' (' + imdbData.votes + ' votes)' : 'No rating') + '>' : 'Not found'),
         short: true
       }];
       if ((imdbData && imdbData.year) || rtData.year) {
