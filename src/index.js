@@ -2,10 +2,9 @@
 
 var express = require('express');
 var bodyParser = require('body-parser');
-var numeral = require('numeral');
 var slack = require('slack-notify')(process.env.SLACK_HOOK_URL);
 
-var imdb = require('node-movie');
+var IMDb = require('./imdb.js');
 var RottenTomatoes = require('./rottentomatoes.js');
 var rt = new RottenTomatoes(process.env.RT_API_KEY);
 
@@ -23,8 +22,8 @@ app.post('/', function (req, res) {
     }
 
     // Search IMDb
-    var imdbCallback = function(err, imdbData) {
-      if (err || !imdbData) {
+    var imdbCallback = function(imdbData) {
+      if (!imdbData) {
         res.status(404).send('Movie not found');
         return;
       }
@@ -36,20 +35,20 @@ app.post('/', function (req, res) {
         short: true
       }, {
         title: 'IMDb Rating',
-        value: '<http://www.imdb.com/title/' + imdbData.imdbID + '|' + (imdbData.imdbRating !== 'N/A' ? imdbData.imdbRating + ' (' + numeral(imdbData.imdbVotes).format('0,0') + ' votes)' : '_No rating_') + '>',
+        value: '<http://www.imdb.com/title/tt' + imdbData.imdbId + '|' + (imdbData.rating ? imdbData.rating + ' (' + imdbData.votes + ' votes)' : '_No rating_') + '>',
         short: true
       }];
-      if (imdbData.Year || rtData.year) {
+      if (imdbData.year || rtData.year) {
         fields.push({
           title: 'Year',
-          value: (imdbData.Year ? imdbData.Year : rtData.year),
+          value: (imdbData.year ? imdbData.year : rtData.year),
           short: true
         });
       }
-      if (imdbData.Runtime !== 'N/A' || rtData.runtime) {
+      if (imdbData.runtime || rtData.runtime) {
         fields.push({
           title: 'Runtime',
-          value: (imdbData.Runtime !== 'N/A' ? imdbData.Runtime : rtData.runtime + ' min'),
+          value: (imdbData.runtime ? imdbData.runtime : rtData.runtime + ' min'),
           short: true
         });
       }
@@ -62,7 +61,7 @@ app.post('/', function (req, res) {
         text: '_' + req.body.command + ' ' + req.body.text + '_',
         attachments: [{
           title: rtData.title,
-          title_link: rtData.links.alternate,
+          // title_link: rtData.links.alternate,
           color: '#FDEE00',
           image_url: (rtData.posters ? rtData.posters.original : null),
           fields: fields
@@ -74,9 +73,9 @@ app.post('/', function (req, res) {
 
     var imdbId = (rtData.alternate_ids ? rtData.alternate_ids.imdb : null);
     if (imdbId) {
-      imdb.getByID('tt' + imdbId, imdbCallback);
+      IMDb.search(imdbId, imdbCallback);
     } else {
-      imdb(q, imdbCallback);
+      imdbCallback(null);
     }
   });
 });

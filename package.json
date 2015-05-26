@@ -8,9 +8,8 @@
   },
   "dependencies": {
     "body-parser": "^1.12.4",
+    "cheerio": "^0.19.0",
     "express": "^4.12.4",
-    "node-movie": "^2.0.0",
-    "numeral": "^1.5.3",
     "slack-notify": "^0.1.4"
   },
   "engines": {
