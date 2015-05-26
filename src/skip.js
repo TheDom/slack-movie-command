@@ -11,7 +11,8 @@ var Skip = {};
 
 Skip.search = function(name) {
   return when.promise(function(resolve, reject) {
-    request('http://www.skip.at/suche/?q=' + querystring.escape(name), function(error, response, body) {
+    var url = 'http://www.skip.at/suche/?q=' + querystring.escape(name) + '&models=movies.movie';
+    request(url, function(error, response, body) {
       if (error || response.statusCode !== 200) {
         resolve(null);
         return;
