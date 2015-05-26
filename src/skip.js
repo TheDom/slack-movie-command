@@ -18,7 +18,7 @@ Skip.search = function(name) {
         return;
       }
 
-      var skipId = getSkipMovieIdFromBody(body);
+      var skipId = getMovieIdFromBody(body);
       if (!skipId) {
         resolve(null);
         return;
@@ -38,7 +38,7 @@ Skip.search = function(name) {
   });
 };
 
-function getSkipMovieIdFromBody(body) {
+function getMovieIdFromBody(body) {
   var $ = cheerio.load(body);
   var link = $('.box.listing ul h2 a').first().attr('href');
   var m = (link ? link.match(/\/film\/(\d+)\/?/) : null);
@@ -62,22 +62,14 @@ function findShowtimes(skipId, date) {
 
       var $ = cheerio.load(body);
       $('ul.schedule-listing li').each(function(idx, el) {
-        var cinemaLink = $(this).find('h4 a').attr('href');
-        var m = (cinemaLink ? cinemaLink.match(/\/kino\/(\d+)\/?/) : null);
-        var cinemaId = (m && m.length >= 2 ? m[1] : null);
+        var cinemaId = getCinemaIdFromElement($(this));
         var entry = {
           cinema: $(this).find('h4 a').text(),
           url: 'http://www.skip.at/kinoprogramm/wien/kinos/?filter=OF&kino=' + cinemaId + '&datum=' + dateStr,
           showtimes: []
         };
         $(this).find('div.times div.time').each(function(idx2, el2) {
-          var meta = [];
-          $(this).find('span.additional').each(function(idx3, el3) {
-            meta.push($(this).text());
-            $(this).text('');
-          });
-          var showtime = $(this).text().trim().replace('.', ':') + (meta.length ? ' (' + meta.join(' ') + ')' : '');
-          entry.showtimes.push(showtime);
+          entry.showtimes.push(getShowtimeFromElement($(this), $));
         });
         data.cinemas.push(entry);
       });
@@ -85,6 +77,21 @@ function findShowtimes(skipId, date) {
       resolve(data);
     });
   });
+}
+
+function getCinemaIdFromElement(el) {
+  var cinemaLink = el.find('h4 a').attr('href');
+  var m = (cinemaLink ? cinemaLink.match(/\/kino\/(\d+)\/?/) : null);
+  return (m && m.length >= 2 ? m[1] : null);
+}
+
+function getShowtimeFromElement(el, $) {
+  var meta = [];
+  el.find('span.additional').each(function(idx, el) {
+    meta.push($(this).text());
+    $(this).text('');
+  });
+  return el.text().trim().replace('.', ':') + (meta.length ? ' (' + meta.join(' ') + ')' : '');
 }
 
 module.exports = Skip;
