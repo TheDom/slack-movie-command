@@ -1,6 +1,6 @@
 'use strict';
 
-var http = require('http');
+var request = require('request');
 var querystring = require('querystring');
 
 var RottenTomatoes = function(apiKey) {
@@ -8,26 +8,20 @@ var RottenTomatoes = function(apiKey) {
 };
 
 RottenTomatoes.prototype.search = function(name, callback) {
-  var reqOptions = {
-    host: 'api.rottentomatoes.com',
-    path: '/api/public/v1.0/movies.json?apikey=' + this.apiKey + '&q=' + querystring.escape(name) + '&page_limit=1&page=1'
-  };
+  var url = 'http://api.rottentomatoes.com/api/public/v1.0/movies.json?apikey=' + this.apiKey + '&q=' + querystring.escape(name) + '&page_limit=1&page=1';
+  request(url, function(error, response, body) {
+    if (error || response.statusCode !== 200) {
+      callback(null);
+      return;
+    }
 
-  var reqCallback = function(response) {
-    var str = '';
-    response.on('data', function(chunk) { str += chunk; });
-    response.on('error', function(e) { callback(null); });
-    response.on('end', function() {
-      var res = JSON.parse(str);
-      if (res.movies && res.movies.length) {
-        callback(res.movies[0]);
-      } else {
-        callback(null);
-      }
-    });
-  };
-
-  http.request(reqOptions, reqCallback).end();
+    var res = JSON.parse(body);
+    if (res.movies && res.movies.length) {
+      callback(res.movies[0]);
+    } else {
+      callback(null);
+    }
+  });
 };
 
 module.exports = RottenTomatoes;
