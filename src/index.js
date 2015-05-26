@@ -23,10 +23,6 @@ app.post('/', function (req, res) {
 
     // Search IMDb
     var imdbCallback = function(imdbData) {
-      if (!imdbData) {
-        res.status(404).send('Movie not found');
-        return;
-      }
 
       // Build Slack response
       var fields = [{
@@ -35,20 +31,20 @@ app.post('/', function (req, res) {
         short: true
       }, {
         title: 'IMDb Rating',
-        value: '<http://www.imdb.com/title/tt' + imdbData.imdbId + '|' + (imdbData.rating ? imdbData.rating + ' (' + imdbData.votes + ' votes)' : '_No rating_') + '>',
+        value: (imdbData ? '<http://www.imdb.com/title/tt' + imdbData.imdbId + '|' + (imdbData.rating ? imdbData.rating + ' (' + imdbData.votes + ' votes)' : '_No rating_') + '>' : '_Not found_'),
         short: true
       }];
-      if (imdbData.year || rtData.year) {
+      if ((imdbData && imdbData.year) || rtData.year) {
         fields.push({
           title: 'Year',
-          value: (imdbData.year ? imdbData.year : rtData.year),
+          value: (imdbData && imdbData.year ? imdbData.year : rtData.year),
           short: true
         });
       }
-      if (imdbData.runtime || rtData.runtime) {
+      if ((imdbData && imdbData.runtime) || rtData.runtime) {
         fields.push({
           title: 'Runtime',
-          value: (imdbData.runtime ? imdbData.runtime : rtData.runtime + ' min'),
+          value: ((imdbData && imdbData.runtime) ? imdbData.runtime : rtData.runtime + ' min'),
           short: true
         });
       }

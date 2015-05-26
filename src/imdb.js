@@ -17,7 +17,7 @@ IMDb.search = function(imdbId, callback) {
       var $ = cheerio.load(str);
 
       callback({
-        imdbID: imdbId,
+        imdbId: imdbId,
         title: $('h1.header span.itemprop').text(),
         year: $('h1.header span.nobr a').text(),
         rating: $('span[itemprop=ratingValue]').text(),
