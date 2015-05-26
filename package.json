@@ -11,7 +11,8 @@
     "cheerio": "^0.19.0",
     "express": "^4.12.4",
     "request": "^2.55.0",
-    "slack-notify": "^0.1.4"
+    "slack-notify": "^0.1.4",
+    "when": "^3.7.3"
   },
   "engines": {
     "node": "0.12.x"
