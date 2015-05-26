@@ -3,7 +3,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var slack = require('slack-notify')(process.env.SLACK_HOOK_URL);
-var when = require('when');
 
 var Skip = require('./skip.js');
 var IMDb = require('./imdb.js');
@@ -18,7 +17,7 @@ app.post('/', function (req, res) {
   var q = req.body.text;
 
   // Fetch movie data from Rotten Tomatoes and IMDb
-  var dataPromise = when.promise(function(resolve, reject) {
+  var dataPromise = new Promise(function(resolve, reject) {
     rt.search(q, function(rtData) {
       if (!rtData || rtData.id === '770948116') {   // The movie with the ID 770948116 gets usually returned for wrong input
         reject();
@@ -41,7 +40,7 @@ app.post('/', function (req, res) {
   var skipPromise = Skip.search(q);
 
   // Respond to Slack
-  when.all([dataPromise, skipPromise]).then(function(data) {
+  Promise.all([dataPromise, skipPromise]).then(function(data) {
     var rtData = data[0].rt;
     var imdbData = data[0].imdb;
     var showtimes = data[1];

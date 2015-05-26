@@ -1,6 +1,5 @@
 'use strict';
 
-var when = require('when');
 var request = require('request');
 var querystring = require('querystring');
 var cheerio = require('cheerio');
@@ -10,7 +9,7 @@ var weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 var Skip = {};
 
 Skip.search = function(name) {
-  return when.promise(function(resolve, reject) {
+  return new Promise(function(resolve, reject) {
     var url = 'http://www.skip.at/suche/?q=' + querystring.escape(name) + '&models=movies.movie';
     request(url, function(error, response, body) {
       if (error || response.statusCode !== 200) {
@@ -31,7 +30,7 @@ Skip.search = function(name) {
         showtimePromises.push(findShowtimes(skipId, new Date(date.getTime() + i * 86400000)));
       }
 
-      when.all(showtimePromises).then(function(showtimes) {
+      Promise.all(showtimePromises).then(function(showtimes) {
         resolve(showtimes);
       });
     });
@@ -46,7 +45,7 @@ function getMovieIdFromBody(body) {
 }
 
 function findShowtimes(skipId, date) {
-  return when.promise(function(resolve, reject) {
+  return new Promise(function(resolve, reject) {
     var dateStr = date.toISOString().substr(0, 10);
     var url = 'http://www.skip.at/kinoprogramm/wien/filme/?filter=OF&film=' + skipId + '&datum=' + dateStr;
     request(url, function(error, response, body) {
