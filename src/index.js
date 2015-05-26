@@ -67,7 +67,7 @@ app.post('/', function (req, res) {
 
     if (showtimes) {
       showtimes.forEach(function(el) {
-        if (el.cinemas) {
+        if (el.cinemas && el.cinemas.length) {
           var showtimesStr = '';
           el.cinemas.forEach(function(el2) {
             showtimesStr += '<' + el2.url + '|' + el2.cinema + '>: ' + el2.showtimes.join(', ') + '\n';
