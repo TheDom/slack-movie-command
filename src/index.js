@@ -44,7 +44,7 @@ app.post('/', function (req, res) {
       if ((imdbData && imdbData.runtime) || rtData.runtime) {
         fields.push({
           title: 'Runtime',
-          value: ((imdbData && imdbData.runtime) ? imdbData.runtime : rtData.runtime + ' min'),
+          value: (imdbData && imdbData.runtime ? imdbData.runtime : rtData.runtime + ' min'),
           short: true
         });
       }
