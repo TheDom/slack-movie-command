@@ -14,7 +14,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post('/', function (req, res) {
   var q = req.body.text;
-  // Search RottenTomatoes
+  // Search Rotten Tomatoes
   rt.search(q, function(rtData) {
     if (!rtData || rtData.id === '770948116') {   // The movie with the ID 770948116 gets usually returned for wrong input
       res.status(404).send('Movie not found');
