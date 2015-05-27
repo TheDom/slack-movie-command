@@ -87,7 +87,10 @@ function getCinemaIdFromElement(el) {
 function getShowtimeFromElement(el, $) {
   var meta = [];
   el.find('span.additional').each(function(idx, el) {
-    meta.push($(this).text());
+    var text = $(this).text().replace('digital', '').trim();
+    if (text) {
+      meta.push(text);
+    }
     $(this).text('');
   });
   return el.text().trim().replace('.', ':') + (meta.length ? ' (' + meta.join(' ') + ')' : '');
